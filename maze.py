@@ -1,10 +1,12 @@
+from pyamaze import maze,agent,COLOR,textLabel
 import turtle                    
 import time
 import sys
 from collections import deque
+import datetime
 
         
-
+an1=datetime.datetime.now()
 grid=[]
 satir=0
 with open ('url2.txt','r') as file:
@@ -97,8 +99,8 @@ def setup_maze(grid):
             screen_y = 288 - (y * 24)          
 
             if character == "+":
-                maze.goto(screen_x, screen_y)         
-                maze.stamp()                          
+                maze1.goto(screen_x, screen_y)         
+                maze1.stamp()                          
                 walls.append((screen_x, screen_y))    
             if character == " " or character == "e":
                 path.append((screen_x, screen_y))     
@@ -117,6 +119,7 @@ def setup_maze(grid):
 def endProgram():
     wn.exitonclick()
     sys.exit()
+
 
 def search(x,y):
     frontier.append((x, y))
@@ -171,7 +174,7 @@ def backRoute(x, y):
         x, y = solution[x, y]               
 
 
-maze = Maze()
+maze1 = Maze()
 red = Red()
 blue = Blue()
 green = Green()
@@ -190,3 +193,61 @@ setup_maze(grid)
 search(start_x,start_y)
 backRoute(end_x, end_y)
 wn.exitonclick()
+
+
+an2=datetime.datetime.now()
+print(an2-an1)
+
+
+an3=datetime.datetime.now()
+def BFS(m):
+    start=(m.rows,m.cols)
+    frontier=[start]
+    explored=[start]
+    bfsPath={}
+    print(start)
+    while len(frontier)>0:
+        currCell=frontier.pop(0)
+        if currCell==(1,1):
+            break
+        for d in 'ESNW':
+            if m.maze_map[currCell][d]==True:
+                if d=='E':
+                    childCell=(currCell[0],currCell[1]+1)
+                elif d=='W':
+                    childCell=(currCell[0],currCell[1]-1)
+                elif d=='N':
+                    childCell=(currCell[0]-1,currCell[1])
+                elif d=='S':
+                    childCell=(currCell[0]+1,currCell[1])
+                if childCell in explored:
+                    continue
+                frontier.append(childCell)
+                explored.append(childCell)
+                bfsPath[childCell]=currCell
+                
+    fwdPath={}
+    cell=(1,1)
+    while cell!=start:
+        fwdPath[bfsPath[cell]]=cell
+        cell=bfsPath[cell]
+        print(fwdPath, "a")
+    return fwdPath
+
+
+if __name__=='__main__':
+    a=int(input("enter a value"))
+    b=int(input("enter a value"))
+    m=maze(a,b)
+    m.CreateMaze(loopPercent=40)
+    path=BFS(m)
+
+    a=agent(m,footprints=True,filled=True)
+    m.tracePath({a:path})
+    an4=datetime.datetime.now()
+    
+    
+    l=textLabel(m,'en kısa yolun uzunlugu',len(path)+1)
+    c=textLabel(m,'gecen sure:',an4-an3)
+
+    m.run()
